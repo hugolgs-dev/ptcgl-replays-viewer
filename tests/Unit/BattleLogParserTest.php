@@ -42,6 +42,28 @@ class BattleLogParserTest extends TestCase
         $this->assertSame('Ash', $action['player']);
     }
 
+    public function test_tools_carry_the_tool_and_its_target(): void
+    {
+        $action = $this->parseLine('Ash attached Forest Seal Stone to Gardevoir ex on the Bench.');
+
+        $this->assertSame('attach_tool', $action['type']);
+        $this->assertSame(['Forest Seal Stone', 'Gardevoir ex'], $action['cards']);
+    }
+
+    public function test_special_conditions_are_classified(): void
+    {
+        $this->assertSame('status_condition', $this->parseLine("Ash's Pikachu is now Poisoned.")['type']);
+        $this->assertSame('status_condition', $this->parseLine("Ash's Pikachu is no longer Asleep.")['type']);
+    }
+
+    public function test_energy_attachments_name_the_energy_card(): void
+    {
+        $action = $this->parseLine('Ash attached Basic Water Energy to Staryu on the Bench.');
+
+        $this->assertSame('attach_energy', $action['type']);
+        $this->assertSame(['Basic Water Energy'], $action['cards']);
+    }
+
     public function test_forced_switches_carry_the_incoming_pokemon(): void
     {
         $action = $this->parseLine("Gary's Toucannon was switched with Gary's Tatsugiri to become the Active Pokémon.");
@@ -53,7 +75,7 @@ class BattleLogParserTest extends TestCase
 
     public function test_a_real_log_parses_end_to_end(): void
     {
-        $game = (new BattleLogParser)->parse(file_get_contents(__DIR__.'/../Fixtures/froslass-vs-toucannon.txt'));
+        $game = (new BattleLogParser)->parse(file_get_contents(__DIR__.'/../../resources/samples/froslass-vs-toucannon.txt'));
 
         $this->assertSame(['Alice', 'Bob'], [$game['players'][0]['name'], $game['players'][1]['name']]);
         $this->assertSame(9, $game['totalTurns']);

@@ -11,6 +11,8 @@ const props = withDefaults(
         isKnockedOut?: boolean;
         size?: 'sm' | 'md' | 'lg';
         showDamage?: boolean;
+        conditions?: string[];
+        tool?: string | null;
     }>(),
     {
         isActive: false,
@@ -19,6 +21,8 @@ const props = withDefaults(
         isKnockedOut: false,
         size: 'md',
         showDamage: true,
+        conditions: () => [],
+        tool: null,
     },
 );
 
@@ -27,6 +31,34 @@ const props = withDefaults(
 const emit = defineEmits<{ (e: 'select'): void }>();
 
 const cardImages = inject<Ref<Record<string, string>>>('cardImages');
+const cardHp = inject<Ref<Record<string, number>>>('cardHp');
+
+// Like the game: show remaining HP when the card's HP is known, else damage.
+const hp = computed(() => cardHp?.value[props.name] ?? null);
+const remainingHp = computed(() =>
+    hp.value === null ? null : Math.max(0, hp.value - props.damage),
+);
+const hpClass = computed(() => {
+    if (hp.value === null || remainingHp.value === null) {
+        return 'bg-red-600';
+    }
+
+    const ratio = remainingHp.value / hp.value;
+
+    return ratio > 0.5
+        ? 'bg-emerald-600'
+        : ratio > 0.25
+          ? 'bg-amber-500'
+          : 'bg-red-600';
+});
+
+const CONDITION_STYLE: Record<string, string> = {
+    Poisoned: 'bg-purple-600',
+    Burned: 'bg-orange-600',
+    Asleep: 'bg-blue-600',
+    Paralyzed: 'bg-yellow-500 text-black',
+    Confused: 'bg-pink-600',
+};
 
 const imageUrl = computed(() => {
     const base = cardImages?.value[props.name];
@@ -74,12 +106,41 @@ const sizeClasses = computed(() => {
             class="absolute inset-0 h-full w-full object-cover"
         />
 
-        <!-- Damage counter -->
+        <!-- HP / damage counter -->
         <div
-            v-if="showDamage && damage > 0 && !isKnockedOut"
-            class="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-xs font-bold text-white shadow-lg"
+            v-if="showDamage && !isKnockedOut && (hp !== null || damage > 0)"
+            class="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs font-bold text-white shadow-lg"
+            :class="hp !== null ? hpClass : 'bg-red-600'"
+            :title="
+                hp !== null ? `${remainingHp} / ${hp} HP` : `${damage} damage`
+            "
         >
-            {{ damage }}
+            {{ hp !== null ? remainingHp : damage }}
+        </div>
+
+        <!-- Special conditions -->
+        <div
+            v-if="conditions.length && !isKnockedOut"
+            class="absolute top-1 left-1 flex flex-col gap-0.5"
+        >
+            <span
+                v-for="condition in conditions"
+                :key="condition"
+                class="rounded px-1 text-[8px] font-bold text-white uppercase"
+                :class="CONDITION_STYLE[condition] ?? 'bg-gray-600'"
+                :title="condition"
+            >
+                {{ condition.slice(0, 3) }}
+            </span>
+        </div>
+
+        <!-- Tool -->
+        <div
+            v-if="tool"
+            class="absolute bottom-4 left-1 flex h-4 w-4 items-center justify-center rounded-full bg-black/60"
+            :title="tool"
+        >
+            <UIcon name="i-lucide-wrench" class="h-2.5 w-2.5 text-white" />
         </div>
 
         <!-- Knocked out overlay -->

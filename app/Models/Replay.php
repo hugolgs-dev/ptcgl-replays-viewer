@@ -127,7 +127,25 @@ class Replay extends Model
                     $names[] = $card;
                 }
             }
+
+            // Hand/side-effect cards only appear in prose: drawn cards, "• A, B"
+            // lists, cards added to a hand, energy/tools attached by effects.
+            foreach ([$action['description'] ?? '', ...($action['details'] ?? [])] as $line) {
+                if (! is_string($line)) {
+                    continue;
+                }
+
+                if (str_starts_with($line, "\u{2022}")) {
+                    array_push($names, ...array_map('trim', explode(',', substr($line, strlen("\u{2022}")))));
+                } elseif (preg_match('/attached (.+?) to /', $line, $m)
+                    || preg_match('/^\w+ drew (?!a card|\d+ cards)(.+?)\.$/', $line, $m)
+                    || preg_match('/^(.+?) was added to \w+\'s hand\.$/', $line, $m)) {
+                    $names[] = $m[1];
+                }
+            }
         }
+
+        $names = array_filter($names, fn (string $name): bool => $name !== '' && $name !== 'A card');
 
         return array_values(array_unique($names));
     }

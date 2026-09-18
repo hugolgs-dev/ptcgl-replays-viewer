@@ -24,6 +24,7 @@ export type ActionType =
     | 'stadium'
     | 'item'
     | 'exp_share'
+    | 'status_condition'
     | 'unknown';
 
 export interface GameAction {
@@ -64,6 +65,15 @@ export interface PokemonState {
     damage: number;
     isKnockedOut: boolean;
     energy: string[];
+    tool: string | null;
+    /** Poisoned, Burned, Asleep, Paralyzed, Confused */
+    conditions: string[];
+}
+
+/** Approximate: the log only names cards it reveals. `known` ⊆ hand. */
+export interface HandState {
+    size: number;
+    known: string[];
 }
 
 export interface PlayerBoardState {
@@ -71,6 +81,7 @@ export interface PlayerBoardState {
     active: PokemonState | null;
     bench: PokemonState[];
     prizeCards: number;
+    hand: HandState;
 }
 
 export interface BoardState {
@@ -107,6 +118,7 @@ export const ACTION_LABELS: Record<ActionType, string> = {
     stadium: 'Stadium',
     item: 'Item',
     exp_share: 'Exp. Share',
+    status_condition: 'Condition',
     unknown: 'Action',
 };
 
@@ -136,5 +148,6 @@ export const ACTION_COLORS: Record<ActionType, string> = {
     stadium: 'text-emerald-400',
     item: 'text-sky-400',
     exp_share: 'text-amber-400',
+    status_condition: 'text-purple-400',
     unknown: 'text-gray-400',
 };

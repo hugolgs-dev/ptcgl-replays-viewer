@@ -175,12 +175,12 @@ class ReplayController extends Controller
      * Card props for the viewer: raw-name => tcgdex base image URL, raw-name
      * => category, and whether any card is still waiting on the resolver job.
      *
-     * @return array{cardImages: array<string, string>, cardCategories: array<string, string>, cardsResolving: bool}
+     * @return array{cardImages: array<string, string>, cardCategories: array<string, string>, cardHp: array<string, int>, cardsResolving: bool}
      */
     private function cardsFor(Replay $replay): array
     {
         $names = $replay->cardNames();
-        $props = ['cardImages' => [], 'cardCategories' => [], 'cardsResolving' => false];
+        $props = ['cardImages' => [], 'cardCategories' => [], 'cardHp' => [], 'cardsResolving' => false];
 
         if ($names === []) {
             return $props;
@@ -205,6 +205,10 @@ class ReplayController extends Controller
 
             if ($card->category !== null) {
                 $props['cardCategories'][$name] = $card->category;
+            }
+
+            if ($card->hp !== null) {
+                $props['cardHp'][$name] = $card->hp;
             }
         }
 

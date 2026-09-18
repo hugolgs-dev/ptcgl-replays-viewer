@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
  * @property string|null $tcgdex_id
  * @property string|null $image
  * @property string|null $category
+ * @property int|null $hp
  * @property Carbon|null $resolved_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -29,6 +30,23 @@ class Card extends Model
         $name = Str::ascii(trim($name));
 
         return Str::lower(str_replace("'", '', $name));
+    }
+
+    /**
+     * Trainer sub-type (Item, Supporter, Stadium, Tool) for trainers, otherwise
+     * the top-level category (Pokemon, Energy).
+     *
+     * @param  array<string, mixed>  $detail  tcgdex card detail payload
+     */
+    public static function categoryFromTcgdex(array $detail): ?string
+    {
+        $category = $detail['category'] ?? null;
+
+        if ($category === 'Trainer' && isset($detail['trainerType'])) {
+            return (string) $detail['trainerType'];
+        }
+
+        return is_string($category) ? $category : null;
     }
 
     /**

@@ -88,7 +88,7 @@ class CardResolutionTest extends TestCase
     public function test_tcgdex_lookup_prefers_exact_matches_and_reads_the_category(): void
     {
         Http::fake([
-            'api.tcgdex.net/v2/en/cards/sv1-1' => Http::response(['id' => 'sv1-1', 'name' => 'Rare Candy', 'category' => 'Trainer', 'trainerType' => 'Item']),
+            'api.tcgdex.net/v2/en/cards/sv1-1' => Http::response(['id' => 'sv1-1', 'name' => 'Rare Candy', 'category' => 'Trainer', 'trainerType' => 'Item', 'hp' => null]),
             'api.tcgdex.net/v2/en/cards?name=eq*' => Http::response([['id' => 'sv1-1', 'name' => 'Rare Candy', 'image' => 'img']]),
             'api.tcgdex.net/*' => Http::response([['id' => 'wrong', 'name' => 'Rare Candy Jar']]),
         ]);
@@ -97,6 +97,7 @@ class CardResolutionTest extends TestCase
 
         $this->assertSame('sv1-1', $result['tcgdex_id']);
         $this->assertSame('Item', $result['category']);
+        $this->assertNull($result['hp']);
     }
 
     public function test_tcgdex_lookup_throws_on_transport_errors_instead_of_returning_a_miss(): void
@@ -118,11 +119,16 @@ class CardResolutionTest extends TestCase
             ]),
             'api.tcgdex.net/v2/en/sets/old' => Http::response(['id' => 'old', 'releaseDate' => '2023-01-01']),
             'api.tcgdex.net/v2/en/sets/new' => Http::response(['id' => 'new', 'releaseDate' => '2025-01-01']),
+            'api.tcgdex.net/v2/en/cards/new-1' => Http::response(['id' => 'new-1', 'name' => 'Pikachu', 'hp' => 70, 'category' => 'Pokemon']),
+            'api.tcgdex.net/v2/en/cards/old-1' => Http::response(['id' => 'old-1', 'name' => 'Pikachu', 'hp' => 60, 'category' => 'Pokemon']),
         ]);
 
         $this->artisan('cards:seed-standard')->assertSuccessful();
 
-        $this->assertSame('new-img', Card::where('log_name', 'pikachu')->sole()->image);
+        $pikachu = Card::where('log_name', 'pikachu')->sole();
+        $this->assertSame('new-img', $pikachu->image);
+        $this->assertSame(70, $pikachu->hp);
+        $this->assertSame('Pokemon', $pikachu->category);
         $this->assertDatabaseMissing('cards', ['log_name' => 'no art']);
     }
 
@@ -148,6 +154,7 @@ class CardResolutionTest extends TestCase
             'name' => 'Pikachu',
             'image' => 'https://assets.tcgdex.net/en/base/base1/58',
             'category' => 'Pokemon',
+            'hp' => 60,
             'resolved_at' => now(),
         ]);
 
@@ -165,6 +172,7 @@ class CardResolutionTest extends TestCase
                 ->component('replay/Show')
                 ->where('cardImages.Pikachu', 'https://assets.tcgdex.net/en/base/base1/58')
                 ->where('cardCategories.Pikachu', 'Pokemon')
+                ->where('cardHp.Pikachu', 60)
                 ->missing('cardImages.Mystery Mon')
             );
     }

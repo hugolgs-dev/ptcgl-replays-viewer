@@ -10,7 +10,7 @@ interface CardLookup
      * `category` is the trainer sub-type (Item, Supporter, Stadium, Tool) for
      * trainers, otherwise the top-level category (Pokemon, Energy).
      *
-     * @return array{tcgdex_id: string, name: string, image: ?string, category: ?string}|null
+     * @return array{tcgdex_id: string, name: string, image: ?string, category: ?string, hp: ?int}|null
      */
     public function find(string $name): ?array;
 }

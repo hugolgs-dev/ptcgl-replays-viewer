@@ -3,6 +3,7 @@
 namespace App\Services\Tcgdex;
 
 use App\Contracts\CardLookup;
+use App\Models\Card;
 use Illuminate\Support\Facades\Http;
 
 class TcgdexCardLookup implements CardLookup
@@ -26,7 +27,8 @@ class TcgdexCardLookup implements CardLookup
             'tcgdex_id' => (string) $brief['id'],
             'name' => (string) $brief['name'],
             'image' => isset($brief['image']) ? (string) $brief['image'] : null,
-            'category' => $this->categoryOf(is_array($detail) ? $detail : []),
+            'category' => Card::categoryFromTcgdex(is_array($detail) ? $detail : []),
+            'hp' => is_array($detail) && isset($detail['hp']) ? (int) $detail['hp'] : null,
         ];
     }
 
@@ -40,20 +42,6 @@ class TcgdexCardLookup implements CardLookup
         $brief = is_array($cards) ? ($cards[0] ?? null) : null;
 
         return is_array($brief) && isset($brief['id'], $brief['name']) ? $brief : null;
-    }
-
-    /**
-     * @param  array<string, mixed>  $detail
-     */
-    private function categoryOf(array $detail): ?string
-    {
-        $category = $detail['category'] ?? null;
-
-        if ($category === 'Trainer' && isset($detail['trainerType'])) {
-            return (string) $detail['trainerType'];
-        }
-
-        return is_string($category) ? $category : null;
     }
 
     /**

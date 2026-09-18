@@ -8,6 +8,7 @@ use App\Models\Replay;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
+use Inertia\Inertia;
 use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
 
@@ -21,7 +22,7 @@ class ReplayTest extends TestCase
     {
         Queue::fake();
 
-        $this->post(route('replays.store'), ['log' => file_get_contents(base_path('tests/Fixtures/froslass-vs-toucannon.txt'))])
+        $this->post(route('replays.store'), ['log' => file_get_contents(resource_path('samples/froslass-vs-toucannon.txt'))])
             ->assertSessionHasNoErrors()
             ->assertRedirect();
 
@@ -266,6 +267,48 @@ class ReplayTest extends TestCase
         $this->assertIsArray($fresh->content);
         $this->assertSame($content, $fresh->content);
         $this->assertSame('Ash', $fresh->content['winner']);
+    }
+
+    public function test_card_names_include_energy_attached_in_detail_lines(): void
+    {
+        $replay = Replay::factory()->make([
+            'content' => ['actions' => [
+                ['type' => 'attach_energy', 'cards' => ['Legacy Energy']],
+                ['type' => 'supporter', 'cards' => ['Crispin'], 'details' => ['Ash attached Basic Darkness Energy to Yveltal in the Active Spot.']],
+            ]],
+        ]);
+
+        $this->assertSame(['Legacy Energy', 'Crispin', 'Basic Darkness Energy'], $replay->cardNames());
+    }
+
+    public function test_card_names_include_cards_seen_in_hands(): void
+    {
+        $replay = Replay::factory()->make([
+            'content' => ['actions' => [
+                ['type' => 'draw_card', 'description' => 'Ash drew Staryu.'],
+                ['type' => 'draw_card', 'description' => 'Ash drew a card.'],
+                ['type' => 'unknown', 'description' => "Ultra Ball was added to Ash's hand."],
+                ['type' => 'unknown', 'description' => "A card was added to Ash's hand."],
+                ['type' => 'draw_opening_hand', 'description' => 'Ash drew 7 cards for the opening hand.', 'details' => ['7 drawn cards.', '• Froslass, Rare Candy']],
+            ]],
+        ]);
+
+        $this->assertSame(['Staryu', 'Ultra Ball', 'Froslass', 'Rare Candy'], $replay->cardNames());
+    }
+
+    public function test_the_home_page_serves_the_sample_log_on_demand(): void
+    {
+        $this->get(route('home'))
+            ->assertInertia(fn (AssertableInertia $page) => $page->component('Home')->missing('sampleLog'));
+
+        $partial = $this->get(route('home'), [
+            'X-Inertia' => 'true',
+            'X-Inertia-Version' => Inertia::getVersion(),
+            'X-Inertia-Partial-Component' => 'Home',
+            'X-Inertia-Partial-Data' => 'sampleLog',
+        ])->assertOk();
+
+        $this->assertStringContainsString("Alice's Turn", $partial->json('props.sampleLog'));
     }
 
     public function test_a_replay_belongs_to_a_user(): void

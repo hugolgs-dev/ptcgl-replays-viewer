@@ -14,6 +14,31 @@ const DAMAGE_MOVE_RE =
     /moved (\d+) damage counters? from .+?'s (.+?) to .+?'s (.+?)\.?$/i;
 const DAMAGE_TOOK_RE = /'s (.+?) took (\d+) damage/i;
 const BENCH_ONE_RE = /drew (.+?) and played it to the Bench/i;
+const DISCARDED_FROM_RE = /^(.+?) was discarded from .+?'s (.+?)\.?$/i;
+// ponytail: condition wording guessed from PTCGL; confirm against a real log.
+const CONDITION_ON_RE =
+    /'s (.+?) is now (Poisoned|Burned|Asleep|Paralyzed|Confused)/i;
+const CONDITION_OFF_RE =
+    /'s (.+?) (?:is no longer (?:Poisoned|Burned|Asleep|Paralyzed|Confused)|woke up|recovered)/i;
+// Hand bookkeeping.
+const DREW_ONE_RE = /^\w+ drew a card\.$/i;
+const DREW_MANY_RE = /^\w+ drew (\d+) cards( for the opening hand)?\.$/i;
+const DREW_NAMED_RE = /^\w+ drew (?!a card\b|\d+ cards\b)(.+?)\.$/i;
+const DRAWN_LIST_RE = /^(\d+) drawn cards\.$/i;
+const ADDED_TO_HAND_RE = /^(.+?) was added to (\w+)'s hand\.$/i;
+const SHUFFLED_IN_RE = /shuffled (\d+) cards into their deck/i;
+const DISCARDED_MANY_RE = /discarded (\d+) cards\.$/i;
+const PLAYED_FROM_HAND = new Set([
+    'play_to_active',
+    'play_to_bench',
+    'item',
+    'supporter',
+    'stadium',
+    'play_card',
+    'attach_energy',
+    'attach_tool',
+    'evolve',
+]);
 
 export function findPokemon(
     side: PlayerBoardState,
@@ -28,37 +53,29 @@ export function findPokemon(
     return side.bench.find((p) => p.name.toLowerCase() === lower) ?? null;
 }
 
-/**
- * PTCGL prints the wrong owner in "put a damage counter on X's Y" lines, so
- * look on the expected side first, then the other one.
- */
-function findAnywhere(
-    state: BoardState,
-    name: string,
-    first: PlayerBoardState,
-): PokemonState | null {
-    const other = first === state.player1 ? state.player2 : state.player1;
-
-    return findPokemon(first, name) ?? findPokemon(other, name);
-}
+const bulletNames = (line: string | undefined): string[] =>
+    line?.startsWith('•')
+        ? line
+              .slice(1)
+              .split(',')
+              .map((n) => n.trim())
+              .filter(Boolean)
+        : [];
 
 export function calculateBoardState(
     actions: GameAction[],
     players: [PlayerInfo, PlayerInfo],
 ): BoardState {
+    const side = (name: string): PlayerBoardState => ({
+        name,
+        active: null,
+        bench: [],
+        prizeCards: 6,
+        hand: { size: 0, known: [] },
+    });
     const state: BoardState = {
-        player1: {
-            name: players[0].name || 'Player 1',
-            active: null,
-            bench: [],
-            prizeCards: 6,
-        },
-        player2: {
-            name: players[1].name || 'Player 2',
-            active: null,
-            bench: [],
-            prizeCards: 6,
-        },
+        player1: side(players[0].name || 'Player 1'),
+        player2: side(players[1].name || 'Player 2'),
         stadium: null,
     };
 
@@ -69,30 +86,71 @@ export function calculateBoardState(
         damage: 0,
         isKnockedOut: false,
         energy: [],
+        tool: null,
+        conditions: [],
     });
+
+    /**
+     * PTCGL prints the wrong owner in "put a damage counter on X's Y" lines,
+     * so look on the expected side first, then the other one.
+     */
+    const findAnywhere = (
+        name: string,
+        first: PlayerBoardState,
+    ): PokemonState | null => {
+        const other = first === state.player1 ? state.player2 : state.player1;
+
+        return findPokemon(first, name) ?? findPokemon(other, name);
+    };
+
+    const sideOf = (playerName: string): PlayerBoardState =>
+        playerName === state.player2.name ? state.player2 : state.player1;
+
+    const hand = {
+        add: (s: PlayerBoardState, count: number, names: string[] = []) => {
+            s.hand.size += count;
+            s.hand.known.push(...names.filter((n) => n !== 'A card'));
+        },
+        remove: (s: PlayerBoardState, count: number, names: string[] = []) => {
+            s.hand.size = Math.max(0, s.hand.size - count);
+
+            for (const name of names) {
+                const i = s.hand.known.indexOf(name);
+
+                if (i !== -1) {
+                    s.hand.known.splice(i, 1);
+                }
+            }
+
+            // Unknown cards leave first; never claim to know more than we hold.
+            s.hand.known.splice(
+                0,
+                Math.max(0, s.hand.known.length - s.hand.size),
+            );
+        },
+    };
 
     // ponytail: same-named Pokémon (two Snorunt) resolve to the first one; the
     // log gives no way to tell them apart.
-    const applyDetail = (
+    const applyLine = (
         playerState: PlayerBoardState,
-        details: string[],
-        index: number,
+        line: string,
+        nextLine: string | undefined,
     ): void => {
-        const detail = details[index];
         let m: RegExpMatchArray | null;
 
-        if ((m = detail.match(ENERGY_RE))) {
-            findAnywhere(state, m[2], playerState)?.energy.push(m[1]);
-        } else if ((m = detail.match(DAMAGE_PUT_RE))) {
-            const target = findAnywhere(state, m[2], playerState);
+        if ((m = line.match(ENERGY_RE))) {
+            findAnywhere(m[2], playerState)?.energy.push(m[1]);
+        } else if ((m = line.match(DAMAGE_PUT_RE))) {
+            const target = findAnywhere(m[2], playerState);
 
             if (target) {
                 target.damage += (m[1] === 'a' ? 1 : Number(m[1])) * 10;
             }
-        } else if ((m = detail.match(DAMAGE_MOVE_RE))) {
+        } else if ((m = line.match(DAMAGE_MOVE_RE))) {
             const amount = Number(m[1]) * 10;
-            const from = findAnywhere(state, m[2], playerState);
-            const to = findAnywhere(state, m[3], playerState);
+            const from = findAnywhere(m[2], playerState);
+            const to = findAnywhere(m[3], playerState);
 
             if (from) {
                 from.damage = Math.max(0, from.damage - amount);
@@ -101,25 +159,56 @@ export function calculateBoardState(
             if (to) {
                 to.damage += amount;
             }
-        } else if ((m = detail.match(DAMAGE_TOOK_RE))) {
-            const target = findAnywhere(state, m[1], playerState);
+        } else if ((m = line.match(DAMAGE_TOOK_RE))) {
+            const target = findAnywhere(m[1], playerState);
 
             if (target) {
                 target.damage += Number(m[2]);
             }
-        } else if ((m = detail.match(BENCH_ONE_RE))) {
-            playerState.bench.push(makePokemon(m[1]));
-        } else if (detail.includes('played them to the Bench')) {
-            // The names follow on the next "• A, B" line.
-            const list = details[index + 1];
+        } else if ((m = line.match(DISCARDED_FROM_RE))) {
+            const target = findAnywhere(m[2], playerState);
 
-            if (list?.startsWith('•')) {
-                for (const name of list.slice(1).split(',')) {
-                    if (name.trim()) {
-                        playerState.bench.push(makePokemon(name));
-                    }
+            if (target?.tool === m[1]) {
+                target.tool = null;
+            } else if (target) {
+                const i = target.energy.indexOf(m[1]);
+
+                if (i !== -1) {
+                    target.energy.splice(i, 1);
                 }
             }
+        } else if ((m = line.match(CONDITION_ON_RE))) {
+            const target = findAnywhere(m[1], playerState);
+
+            if (target && !target.conditions.includes(m[2])) {
+                target.conditions.push(m[2]);
+            }
+        } else if ((m = line.match(CONDITION_OFF_RE))) {
+            const target = findAnywhere(m[1], playerState);
+
+            if (target) {
+                target.conditions = [];
+            }
+        } else if ((m = line.match(BENCH_ONE_RE))) {
+            playerState.bench.push(makePokemon(m[1]));
+        } else if (line.includes('played them to the Bench')) {
+            for (const name of bulletNames(nextLine)) {
+                playerState.bench.push(makePokemon(name));
+            }
+        } else if (DREW_ONE_RE.test(line)) {
+            hand.add(playerState, 1);
+        } else if ((m = line.match(DREW_MANY_RE))) {
+            hand.add(playerState, Number(m[1]), bulletNames(nextLine));
+        } else if ((m = line.match(DRAWN_LIST_RE))) {
+            hand.add(playerState, 0, bulletNames(nextLine));
+        } else if ((m = line.match(DREW_NAMED_RE))) {
+            hand.add(playerState, 1, [m[1]]);
+        } else if ((m = line.match(ADDED_TO_HAND_RE))) {
+            hand.add(sideOf(m[2]), 1, [m[1]]);
+        } else if ((m = line.match(SHUFFLED_IN_RE))) {
+            hand.remove(playerState, Number(m[1]));
+        } else if ((m = line.match(DISCARDED_MANY_RE))) {
+            hand.remove(playerState, Number(m[1]), bulletNames(nextLine));
         }
     };
 
@@ -158,6 +247,8 @@ export function calculateBoardState(
                         : playerState.bench.splice(benchIndex, 1)[0];
 
                 if (playerState.active && !playerState.active.isKnockedOut) {
+                    // Leaving the Active Spot cures special conditions.
+                    playerState.active.conditions = [];
                     playerState.bench.push(playerState.active);
                 }
 
@@ -172,16 +263,20 @@ export function calculateBoardState(
 
                 if (target) {
                     target.name = to;
+                    target.conditions = [];
                 }
 
                 break;
             }
 
-            case 'attach_energy': {
-                const m = action.description.match(ENERGY_RE);
+            case 'attach_tool': {
+                const [tool, targetName] = action.cards ?? [];
+                const target = targetName
+                    ? findPokemon(playerState, targetName)
+                    : null;
 
-                if (m) {
-                    findAnywhere(state, m[2], playerState)?.energy.push(m[1]);
+                if (target && tool) {
+                    target.tool = tool;
                 }
 
                 break;
@@ -235,11 +330,16 @@ export function calculateBoardState(
                 break;
         }
 
-        // Side effects (energy from supporters, ability damage counters, search
-        // results benched, bench damage) live in the indented detail lines.
-        (action.details ?? []).forEach((_, index) =>
-            applyDetail(playerState, action.details!, index),
-        );
+        if (PLAYED_FROM_HAND.has(action.type)) {
+            const played = action.type === 'evolve' ? action.cards?.[1] : card;
+            hand.remove(playerState, 1, played ? [played] : []);
+        }
+
+        // Effects live in prose: the main line (energy attached, cards drawn,
+        // conditions) and the indented detail lines (ability damage counters,
+        // search results benched, bench damage, hand changes).
+        const lines = [action.description, ...(action.details ?? [])];
+        lines.forEach((line, i) => applyLine(playerState, line, lines[i + 1]));
     }
 
     return state;

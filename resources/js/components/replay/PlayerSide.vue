@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, inject } from 'vue';
+import type { Ref } from 'vue';
 import type {
     GameAction,
     PlayerBoardState,
@@ -33,6 +34,27 @@ const isBeingAttacked = computed(
 const emptyBenchSlots = computed(() =>
     Math.max(0, 5 - props.playerState.bench.length),
 );
+
+const cardImages = inject<Ref<Record<string, string>>>('cardImages');
+
+const HAND_PREVIEW = 12;
+
+// Known cards first (with art when resolved), then face-down placeholders.
+const handSlots = computed(() => {
+    const { size, known } = props.playerState.hand;
+    const slots = known.map((name) => ({
+        name,
+        image: cardImages?.value[name]
+            ? `${cardImages.value[name]}/low.webp`
+            : null,
+    }));
+
+    while (slots.length < size) {
+        slots.push({ name: '', image: null });
+    }
+
+    return slots.slice(0, HAND_PREVIEW);
+});
 </script>
 
 <template>
@@ -44,6 +66,41 @@ const emptyBenchSlots = computed(() =>
                 'bg-[color:var(--ui-primary)]/5 ring-1 ring-[color:var(--ui-primary)]/20',
         ]"
     >
+        <!-- Hand (approximate: only revealed cards are known) -->
+        <div
+            class="flex items-center gap-2"
+            :class="isOpponent ? 'flex-row' : 'flex-row-reverse'"
+        >
+            <span class="text-[10px] tracking-wider uppercase opacity-40"
+                >Hand {{ playerState.hand.size }}</span
+            >
+            <div class="flex gap-0.5">
+                <div
+                    v-for="(slot, i) in handSlots"
+                    :key="i"
+                    class="h-11 w-8 overflow-hidden rounded border border-default bg-accented"
+                    :title="slot.name || 'Unknown card'"
+                >
+                    <img
+                        v-if="slot.image"
+                        :src="slot.image"
+                        :alt="slot.name"
+                        class="h-full w-full object-cover"
+                    />
+                    <span
+                        v-else-if="slot.name"
+                        class="block p-0.5 text-[7px] leading-tight"
+                        >{{ slot.name }}</span
+                    >
+                </div>
+                <span
+                    v-if="playerState.hand.size > HAND_PREVIEW"
+                    class="self-center text-[10px] opacity-40"
+                    >+{{ playerState.hand.size - HAND_PREVIEW }}</span
+                >
+            </div>
+        </div>
+
         <!-- Player info -->
         <div
             class="flex items-center justify-between"
@@ -62,11 +119,23 @@ const emptyBenchSlots = computed(() =>
                     >Turn</UBadge
                 >
             </div>
-            <div class="flex items-center gap-1 opacity-60">
+            <div
+                class="flex items-center gap-1"
+                :title="`${playerState.prizeCards} Prize cards left`"
+            >
                 <UIcon name="i-lucide-gift" class="h-4 w-4 text-amber-400" />
-                <span class="text-xs font-medium">{{
-                    playerState.prizeCards
-                }}</span>
+                <div class="flex gap-0.5">
+                    <span
+                        v-for="i in 6"
+                        :key="i"
+                        class="h-4 w-3 rounded-sm border"
+                        :class="
+                            i <= playerState.prizeCards
+                                ? 'border-amber-400 bg-amber-400/70'
+                                : 'border-default bg-transparent opacity-40'
+                        "
+                    />
+                </div>
             </div>
         </div>
 
@@ -96,6 +165,8 @@ const emptyBenchSlots = computed(() =>
                         :is-highlighted="
                             animatingCard === playerState.active.name
                         "
+                        :conditions="playerState.active.conditions"
+                        :tool="playerState.active.tool"
                         size="lg"
                         @select="emit('select', playerState.active)"
                     />
@@ -145,6 +216,8 @@ const emptyBenchSlots = computed(() =>
                             :damage="pokemon.damage"
                             :is-knocked-out="pokemon.isKnockedOut"
                             :is-highlighted="animatingCard === pokemon.name"
+                            :conditions="pokemon.conditions"
+                            :tool="pokemon.tool"
                             size="sm"
                             @select="emit('select', pokemon)"
                         />

@@ -26,6 +26,7 @@ class CardResolver
                 'tcgdex_id' => $result['tcgdex_id'] ?? null,
                 'image' => $result['image'] ?? null,
                 'category' => $result['category'] ?? null,
+                'hp' => $result['hp'] ?? null,
                 'resolved_at' => now(),
             ]);
         }

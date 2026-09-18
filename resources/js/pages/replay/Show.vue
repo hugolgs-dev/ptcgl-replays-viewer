@@ -27,6 +27,7 @@ const props = defineProps<{
     game: ParsedGame;
     cardImages: Record<string, string>;
     cardCategories: Record<string, string>;
+    cardHp: Record<string, number>;
     cardsResolving: boolean;
     canEdit: boolean;
 }>();
@@ -79,12 +80,13 @@ const deleteReplay = (): void => {
 
 // ── Card art: resolved by a queued job, so poll until every card is known ──
 provide('cardImages', toRef(props, 'cardImages'));
+provide('cardHp', toRef(props, 'cardHp'));
 
 let polls = 0;
 const { start: startPolling, stop: stopPolling } = usePoll(
     2000,
     {
-        only: ['cardImages', 'cardCategories', 'cardsResolving'],
+        only: ['cardImages', 'cardCategories', 'cardHp', 'cardsResolving'],
         onFinish: () => {
             if (!props.cardsResolving || ++polls >= 30) {
                 stopPolling();

@@ -2,8 +2,11 @@
 
 use App\Http\Controllers\ReplayController;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
-Route::inertia('/', 'Home')->name('home');
+Route::get('/', fn () => Inertia::render('Home', [
+    'sampleLog' => Inertia::optional(fn (): string => (string) file_get_contents(resource_path('samples/froslass-vs-toucannon.txt'))),
+]))->name('home');
 
 Route::get('replays', [ReplayController::class, 'index'])->name('replays.index');
 Route::post('replays', [ReplayController::class, 'store'])->middleware('throttle:10,1')->name('replays.store');

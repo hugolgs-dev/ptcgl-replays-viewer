@@ -169,6 +169,123 @@ test('detail lines bench search results, attach energy and apply damage counters
     assert.equal(state.player2.active?.damage, 20 + 120 + 50);
 });
 
+test('hand size and known cards follow draws, plays and reveals', () => {
+    const state = calculateBoardState(
+        [
+            act({
+                player: 'Alice',
+                type: 'draw_opening_hand',
+                description: 'Alice drew 7 cards for the opening hand.',
+                details: ['7 drawn cards.', '• Froslass, Rare Candy, Yveltal'],
+            }),
+            act({
+                player: 'Alice',
+                type: 'draw_card',
+                description: 'Alice drew Staryu.',
+            }),
+            act({
+                player: 'Alice',
+                type: 'play_to_active',
+                cards: ['Yveltal'],
+                description: 'Alice played Yveltal to the Active Spot.',
+            }),
+            act({
+                player: 'Alice',
+                type: 'item',
+                cards: ['Ultra Ball'],
+                description: 'Alice played Ultra Ball.',
+                details: [
+                    'Alice discarded 2 cards.',
+                    '• Rare Candy, Staryu',
+                    'Alice drew Meowth ex.',
+                ],
+            }),
+            act({
+                player: 'Alice',
+                type: 'unknown',
+                description: "Boss's Orders was added to Bob's hand.",
+            }),
+            act({
+                player: 'Alice',
+                type: 'supporter',
+                cards: ['Lillie'],
+                description: 'Alice played Lillie.',
+                details: [
+                    'Alice shuffled 5 cards into their deck.',
+                    'Alice drew 3 cards.',
+                ],
+            }),
+        ],
+        players,
+    );
+
+    // 7 +1 -1 (Yveltal) -1 (Ultra Ball) -2 (discard) +1 (Meowth) -1 (Lillie) = 4,
+    // then the whole hand is shuffled away (clamped at 0, known cleared), +3 drawn.
+    assert.equal(state.player1.hand.size, 3);
+    assert.deepEqual(state.player1.hand.known, []);
+    assert.deepEqual(state.player2.hand, { size: 1, known: ["Boss's Orders"] });
+});
+
+test('tools attach and discard; conditions apply and clear on leaving the active spot', () => {
+    const state = calculateBoardState(
+        [
+            act({
+                player: 'Alice',
+                type: 'play_to_active',
+                cards: ['Gardevoir ex'],
+            }),
+            act({ player: 'Alice', type: 'play_to_bench', cards: ['Kirlia'] }),
+            act({
+                player: 'Alice',
+                type: 'attach_tool',
+                cards: ['Forest Seal Stone', 'Gardevoir ex'],
+            }),
+            act({
+                player: 'Bob',
+                type: 'status_condition',
+                description: "Alice's Gardevoir ex is now Poisoned.",
+            }),
+            act({
+                player: 'Bob',
+                type: 'status_condition',
+                description: "Alice's Gardevoir ex is now Asleep.",
+            }),
+            act({
+                player: 'Alice',
+                type: 'discard',
+                description:
+                    "Forest Seal Stone was discarded from Alice's Gardevoir ex.",
+            }),
+            act({ player: 'Alice', type: 'switch_active', cards: ['Kirlia'] }),
+        ],
+        players,
+    );
+
+    assert.equal(state.player1.active?.name, 'Kirlia');
+    assert.deepEqual(state.player1.bench[0]?.conditions, []);
+    assert.equal(state.player1.bench[0]?.tool, null);
+});
+
+test('conditions show while the Pokémon stays active', () => {
+    const state = calculateBoardState(
+        [
+            act({
+                player: 'Alice',
+                type: 'play_to_active',
+                cards: ['Pikachu'],
+            }),
+            act({
+                player: 'Bob',
+                type: 'status_condition',
+                description: "Alice's Pikachu is now Burned.",
+            }),
+        ],
+        players,
+    );
+
+    assert.deepEqual(state.player1.active?.conditions, ['Burned']);
+});
+
 test('uids are stable across recomputation of the same prefix', () => {
     const actions = [
         act({ player: 'Alice', type: 'play_to_bench', cards: ['A'] }),

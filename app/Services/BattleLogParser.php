@@ -6,6 +6,8 @@ namespace App\Services;
 
 /**
  * @phpstan-type Action array{id: int, turn: int, phase: string, player: string, details: list<string>, type: string, description: string, cards?: list<string>, target?: string, damage?: int}
+ *
+ * Line matching is an if/else chain: specific patterns before generic ones.
  */
 class BattleLogParser
 {
@@ -221,12 +223,30 @@ class BattleLogParser
 
         // Attach Energy
         if (str_contains($line, 'attached') && str_contains($line, 'Energy')) {
-            return array_merge($base, ['type' => 'attach_energy', 'description' => $line]);
+            preg_match('/attached (.+? Energy) to/', $line, $m);
+
+            return array_merge($base, [
+                'type' => 'attach_energy',
+                'description' => $line,
+                'cards' => $m ? [$m[1]] : [],
+            ]);
         }
 
         // Attach Tool
         if (str_contains($line, 'attached') && str_contains($line, 'to')) {
-            return array_merge($base, ['type' => 'attach_tool', 'description' => $line]);
+            preg_match('/attached (.+?) to (.+?)(?: on the Bench| in the Active Spot)?\.?$/', $line, $m);
+
+            return array_merge($base, [
+                'type' => 'attach_tool',
+                'description' => $line,
+                'cards' => $m ? [$m[1], $m[2]] : [],
+            ]);
+        }
+
+        // Special conditions. ponytail: wording guessed from PTCGL ("is now Asleep",
+        // "is no longer Poisoned"); confirm against a real log and adjust the regex.
+        if (preg_match('/\b(Poisoned|Burned|Asleep|Paralyzed|Confused)\b/', $line)) {
+            return array_merge($base, ['type' => 'status_condition', 'description' => $line]);
         }
 
         // Use Attack (with damage) — checked before abilities: both use "used"

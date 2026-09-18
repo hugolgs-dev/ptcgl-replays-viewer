@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import SiteHeader from '@/components/SiteHeader.vue';
 import { login, register } from '@/routes';
 import { store } from '@/routes/replays';
 
-const page = usePage<{ auth: { user: { id: number } | null } }>();
+const page = usePage<{
+    auth: { user: { id: number } | null };
+    sampleLog?: string;
+}>();
 const isAuthenticated = computed((): boolean => page.props.auth.user !== null);
 
 const visibilityItems = [
@@ -28,6 +31,16 @@ const submit = (): void => {
 
 const pasteFromClipboard = async (): Promise<void> => {
     form.log = await navigator.clipboard.readText();
+};
+
+// Optional Inertia prop: only fetched when asked for.
+const loadSample = (): void => {
+    router.reload({
+        only: ['sampleLog'],
+        onSuccess: () => {
+            form.log = page.props.sampleLog ?? '';
+        },
+    });
 };
 </script>
 
@@ -62,6 +75,14 @@ const pasteFromClipboard = async (): Promise<void> => {
                                 @click="pasteFromClipboard"
                             >
                                 Paste from clipboard
+                            </UButton>
+                            <UButton
+                                variant="link"
+                                size="xs"
+                                icon="i-lucide-file-text"
+                                @click="loadSample"
+                            >
+                                Load sample log
                             </UButton>
                         </template>
                         <UTextarea
