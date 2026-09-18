@@ -1,0 +1,92 @@
+import inertia from '@inertiajs/vite';
+import { wayfinder } from '@laravel/vite-plugin-wayfinder';
+import tailwindcss from '@tailwindcss/vite';
+import vue from '@vitejs/plugin-vue';
+import laravel from 'laravel-vite-plugin';
+import { bunny } from 'laravel-vite-plugin/fonts';
+import { defineConfig } from 'vite';
+import ui from '@nuxt/ui/vite';
+
+export default defineConfig({
+    plugins: [
+        laravel({
+            input: ['resources/css/app.css', 'resources/js/app.ts'],
+            refresh: true,
+            fonts: [
+                bunny('Roboto', {
+                    weights: [400, 500, 700],
+                }),
+            ],
+        }),
+        inertia(),
+        tailwindcss(),
+        vue({
+            template: {
+                transformAssetUrls: {
+                    base: null,
+                    includeAbsolute: false,
+                },
+            },
+        }),
+        wayfinder({
+            formVariants: true,
+        }),
+        ui({
+            router: 'inertia',
+            ui: {
+                colors: {
+                    primary: 'teal',
+                    secondary: 'cobalt-gray',
+                    info: 'cyan',
+                    warning: 'amber',
+                    neutral: 'cobalt-gray',
+                },
+                icons: {
+                    arrowDown: 'i-bi-arrow-down',
+                    arrowLeft: 'i-bi-arrow-left',
+                    arrowRight: 'i-bi-arrow-right',
+                    arrowUp: 'i-bi-arrow-up',
+                    caution: 'i-bi-exclamation-circle',
+                    check: 'i-bi-check',
+                    chevronDoubleLeft: 'i-bi-chevron-double-left',
+                    chevronDoubleRight: 'i-bi-chevron-double-right',
+                    chevronDown: 'i-bi-chevron-down',
+                    chevronLeft: 'i-bi-chevron-left',
+                    chevronRight: 'i-bi-chevron-right',
+                    chevronUp: 'i-bi-chevron-up',
+                    close: 'i-bi-x',
+                    copy: 'i-bi-clipboard',
+                    copyCheck: 'i-bi-clipboard-check',
+                    dark: 'i-bi-moon',
+                    drag: 'i-bi-grip-vertical',
+                    ellipsis: 'i-bi-three-dots',
+                    error: 'i-bi-x-circle',
+                    external: 'i-bi-box-arrow-up-right',
+                    eye: 'i-bi-eye',
+                    eyeOff: 'i-bi-eye-slash',
+                    file: 'i-bi-file-earmark',
+                    folder: 'i-bi-folder',
+                    folderOpen: 'i-bi-folder2-open',
+                    hash: 'i-bi-hash',
+                    info: 'i-bi-info-circle',
+                    light: 'i-bi-sun',
+                    loading: 'i-bi-arrow-repeat',
+                    menu: 'i-bi-list',
+                    minus: 'i-bi-dash',
+                    panelClose: 'i-bi-arrow-bar-left',
+                    panelOpen: 'i-bi-arrow-bar-right',
+                    plus: 'i-bi-plus',
+                    reload: 'i-bi-arrow-counterclockwise',
+                    search: 'i-bi-search',
+                    stop: 'i-bi-square',
+                    star: 'i-bi-star',
+                    success: 'i-bi-check-circle',
+                    system: 'i-bi-display',
+                    tip: 'i-bi-lightbulb',
+                    upload: 'i-bi-upload',
+                    warning: 'i-bi-exclamation-triangle',
+                },
+            },
+        }),
+    ],
+});

@@ -1,0 +1,282 @@
+Setup
+Alice chose tails for the opening coin flip.
+Alice won the coin toss.
+Alice decided to go first.
+Alice drew 7 cards for the opening hand.
+- 7 drawn cards.
+• Froslass, Basic Water Energy, Legacy Energy, Risky Ruins, Yveltal, Munkidori, Buddy-Buddy Poffin
+Bob drew 7 cards for the opening hand.
+- 7 drawn cards.
+Alice played Yveltal to the Active Spot.
+Bob played Dunsparce to the Active Spot.
+Alice's Turn
+Alice drew Staryu.
+Alice played Risky Ruins to the Stadium spot.
+Alice played Munkidori to the Bench.
+Risky Ruins was activated.
+- Alice put 2 damage counters on Alice's Munkidori.
+Alice played Staryu to the Bench.
+Risky Ruins was activated.
+- Alice put 2 damage counters on Alice's Staryu.
+Alice played Buddy-Buddy Poffin.
+- Alice drew 2 cards and played them to the Bench.
+• Snorunt, Snorunt
+- Alice shuffled their deck.
+Risky Ruins was activated.
+- Alice put 2 damage counters on Alice's Snorunt.
+- Alice put 2 damage counters on Alice's Snorunt.
+Alice attached Legacy Energy to Munkidori on the Bench.
+Alice's Munkidori used Adrena-Brain.
+- Alice moved 2 damage counters from Alice's Staryu to Alice's Dunsparce.
+Alice ended their turn.
+Bob's Turn
+Bob drew a card.
+Bob played Buddy-Buddy Poffin.
+- Bob drew 2 cards and played them to the Bench.
+• Fan Rotom, Dunsparce
+- Bob shuffled their deck.
+Risky Ruins was activated.
+- Bob put 2 damage counters on Alice's Fan Rotom.
+- Bob put 2 damage counters on Alice's Dunsparce.
+Bob played Area Zero Underdepths to the Stadium spot.
+- Alice discarded Risky Ruins.
+Bob played Pikachu ex to the Bench.
+Bob's Fan Rotom used Fan Call.
+- Bob drew 3 cards.
+• Pikipek, Pikipek, Trumbeak
+- Bob shuffled their deck.
+Bob played Pikipek to the Bench.
+Bob played Pikipek to the Bench.
+Bob played Shaymin to the Bench.
+Bob played Poké Pad.
+- Bob drew Dudunsparce.
+- Bob shuffled their deck.
+Bob played Dawn.
+- Bob drew 3 cards.
+• Latias ex, Trumbeak, Toucannon
+- Bob shuffled their deck.
+Bob played Latias ex to the Bench.
+Bob retreated Dunsparce to the Bench.
+Bob's Fan Rotom is now in the Active Spot.
+Bob ended their turn.
+Alice's Turn
+Alice drew Boss's Orders.
+Alice attached Basic Water Energy to Staryu on the Bench.
+Alice evolved Snorunt to Froslass on the Bench.
+Alice's Munkidori used Adrena-Brain.
+- Alice moved 2 damage counters from Alice's Froslass to Alice's Shaymin.
+Alice ended their turn.
+Pokémon Checkup
+Alice's Froslass used Freezing Shroud.
+- Alice put a damage counter on Alice's Munkidori.
+- Alice put a damage counter on Alice's Fan Rotom.
+- Alice put a damage counter on Alice's Pikachu ex.
+- Alice put a damage counter on Alice's Shaymin.
+- Alice put a damage counter on Alice's Latias ex.
+Bob's Turn
+Bob drew a card.
+Bob evolved Pikipek to Trumbeak on the Bench.
+Bob evolved Dunsparce to Dudunsparce on the Bench.
+Bob played Dudunsparce.
+- Bob drew 3 cards.
+- Bob shuffled 2 cards into their deck.
+• Dudunsparce, Dunsparce
+Bob played Poké Pad.
+- Bob drew Dudunsparce.
+- Bob shuffled their deck.
+Bob evolved Dunsparce to Dudunsparce on the Bench.
+Bob played Dudunsparce.
+- Bob drew 3 cards.
+- Bob shuffled 2 cards into their deck.
+• Dudunsparce, Dunsparce
+Bob played Dunsparce to the Bench.
+Bob played Buddy-Buddy Poffin.
+- Bob drew 2 cards and played them to the Bench.
+• Tatsugiri, Dunsparce
+- Bob shuffled their deck.
+Bob retreated Fan Rotom to the Bench.
+Bob's Tatsugiri is now in the Active Spot.
+Bob's Tatsugiri used Attract Customers.
+- Bob drew Lillie's Determination.
+- Bob shuffled their deck.
+Bob attached Spiky Energy to Trumbeak on the Bench.
+Bob evolved Pikipek to Trumbeak on the Bench.
+Bob played Lillie's Determination.
+- Bob shuffled 5 cards into their deck.
+- Bob drew 8 cards.
+Bob ended their turn.
+Pokémon Checkup
+Alice's Froslass used Freezing Shroud.
+- Bob put a damage counter on Alice's Munkidori.
+- Bob put a damage counter on Alice's Tatsugiri.
+- Bob put a damage counter on Alice's Pikachu ex.
+- Bob put a damage counter on Alice's Shaymin.
+- Bob put a damage counter on Alice's Latias ex.
+- Bob put a damage counter on Alice's Fan Rotom.
+Alice's Turn
+Alice drew Crispin.
+Alice played Crispin.
+- Alice drew Basic Water Energy.
+- Alice attached Basic Darkness Energy to Yveltal in the Active Spot.
+- Alice shuffled their deck.
+Alice attached Basic Water Energy to Snorunt on the Bench.
+Alice's Munkidori used Adrena-Brain.
+- Alice moved 2 damage counters from Alice's Snorunt to Alice's Shaymin.
+Alice's Yveltal used Clutch on Bob’s Tatsugiri for 20 damage.
+Pokémon Checkup
+Alice's Froslass used Freezing Shroud.
+- Alice put a damage counter on Alice's Munkidori.
+- Alice put a damage counter on Alice's Tatsugiri.
+- Alice put a damage counter on Alice's Pikachu ex.
+- Alice put a damage counter on Alice's Shaymin.
+- Alice put a damage counter on Alice's Latias ex.
+- Alice put a damage counter on Alice's Fan Rotom.
+Bob's Turn
+Bob drew a card.
+Bob evolved Trumbeak to Toucannon on the Bench.
+Bob evolved Trumbeak to Toucannon on the Bench.
+Bob played Poké Pad.
+- Bob drew Dudunsparce.
+- Bob shuffled their deck.
+Bob evolved Dunsparce to Dudunsparce on the Bench.
+Bob played Dudunsparce.
+- Bob drew 3 cards.
+- Bob shuffled 2 cards into their deck.
+• Dudunsparce, Dunsparce
+Bob attached Mist Energy to Toucannon on the Bench.
+Bob's Toucannon used Aerial Draw.
+- Bob drew a card.
+Bob's Toucannon used Aerial Draw.
+- Bob drew a card.
+Bob played Kieran.
+- Bob chose Switch your Active Pokémon with 1 of your Benched Pokémon.
+- Bob's Toucannon was switched with Bob's Tatsugiri to become the Active Pokémon.
+Bob's Toucannon is now in the Active Spot.
+Bob evolved Dunsparce to Dudunsparce on the Bench.
+Bob played Dudunsparce.
+- Bob drew 3 cards.
+- Bob shuffled 2 cards into their deck.
+• Dudunsparce, Dunsparce
+Bob played Buddy-Buddy Poffin.
+- Bob drew 2 cards and played them to the Bench.
+• Dunsparce, Dunsparce
+- Bob shuffled their deck.
+Bob's Toucannon used Feather Rondo on Alice’s Yveltal for 300 damage.
+- Damage breakdown:
+• Base damage: 60 damage
+• 12 Benched Pokémon: 240 damage
+• Total damage: 300 damage
+Alice's Yveltal was Knocked Out!
+Basic Darkness Energy was discarded from Alice's Yveltal.
+Bob took a Prize card.
+A card was added to Bob's hand.
+Alice's Staryu is now in the Active Spot.
+Pokémon Checkup
+Bob's Shaymin was Knocked Out!
+Alice's Froslass used Freezing Shroud.
+- Bob put a damage counter on Alice's Munkidori.
+- Bob put a damage counter on Alice's Toucannon.
+- Bob put a damage counter on Alice's Pikachu ex.
+- Bob put a damage counter on Alice's Shaymin.
+- Bob put a damage counter on Alice's Latias ex.
+- Bob put a damage counter on Alice's Fan Rotom.
+- Bob put a damage counter on Alice's Toucannon.
+- Bob put a damage counter on Alice's Tatsugiri.
+Alice took a Prize card.
+Ultra Ball was added to Alice's hand.
+Alice's Turn
+Alice drew Munkidori.
+Alice's Munkidori used Adrena-Brain.
+- Alice moved 3 damage counters from Alice's Munkidori to Alice's Toucannon.
+Alice played Ultra Ball.
+- Alice discarded 2 cards.
+• Boss's Orders, Munkidori
+- Alice drew Meowth ex.
+- Alice shuffled their deck.
+Alice played Meowth ex to the Bench.
+Alice's Meowth ex used Last-Ditch Catch.
+- Alice drew Hilda.
+- Alice shuffled their deck.
+Alice played Hilda.
+- Alice drew 2 cards.
+• Mega Starmie ex, Basic Darkness Energy
+- Alice shuffled their deck.
+Alice evolved Staryu to Mega Starmie ex in the Active Spot.
+Alice's Mega Starmie ex used Jetting Blow on Bob’s Toucannon for 120 damage.
+- Bob's Toucannon took 50 damage.
+Spiky Energy was activated.
+- Alice put 2 damage counters on Bob's Mega Starmie ex.
+Pokémon Checkup
+Bob's Fan Rotom was Knocked Out!
+Alice's Froslass used Freezing Shroud.
+- Alice put a damage counter on Alice's Munkidori.
+- Alice put a damage counter on Alice's Meowth ex.
+- Alice put a damage counter on Alice's Toucannon.
+- Alice put a damage counter on Alice's Pikachu ex.
+- Alice put a damage counter on Alice's Latias ex.
+- Alice put a damage counter on Alice's Fan Rotom.
+- Alice put a damage counter on Alice's Toucannon.
+- Alice put a damage counter on Alice's Tatsugiri.
+Alice took a Prize card.
+Ultra Ball was added to Alice's hand.
+Bob's Turn
+Bob drew a card.
+Bob evolved Dunsparce to Dudunsparce on the Bench.
+Bob played Dudunsparce.
+- Bob drew 3 cards.
+- Bob shuffled 2 cards into their deck.
+• Dudunsparce, Dunsparce
+Bob evolved Dunsparce to Dudunsparce on the Bench.
+Bob played Dudunsparce.
+- Bob drew 3 cards.
+- Bob shuffled 2 cards into their deck.
+• Dudunsparce, Dunsparce
+Bob's Toucannon used Aerial Draw.
+- Bob drew a card.
+Bob's Toucannon used Aerial Draw.
+- Bob drew a card.
+Bob played Buddy-Buddy Poffin.
+- Bob drew 2 cards and played them to the Bench.
+• Dunsparce, Dunsparce
+- Bob shuffled their deck.
+Bob played Fan Rotom to the Bench.
+Bob played Lillie's Determination.
+- Bob shuffled 15 cards into their deck.
+- Bob drew 6 cards.
+Bob attached Mist Energy to Fan Rotom on the Bench.
+Bob's Toucannon used Feather Rondo on Alice’s Mega Starmie ex for 280 damage.
+- Damage breakdown:
+• Base damage: 60 damage
+• 11 Benched Pokémon: 220 damage
+• Total damage: 280 damage
+Pokémon Checkup
+Bob's Toucannon was Knocked Out!
+- 3 cards were discarded from Bob's Toucannon.
+• Spiky Energy, Trumbeak, Pikipek
+Bob's Tatsugiri was Knocked Out!
+Alice's Froslass used Freezing Shroud.
+- Bob put a damage counter on Alice's Munkidori.
+- Bob put a damage counter on Alice's Meowth ex.
+- Bob put a damage counter on Alice's Toucannon.
+- Bob put a damage counter on Alice's Pikachu ex.
+- Bob put a damage counter on Alice's Latias ex.
+- Bob put a damage counter on Alice's Toucannon.
+- Bob put a damage counter on Alice's Tatsugiri.
+- Bob put a damage counter on Alice's Fan Rotom.
+Alice took 2 Prize cards.
+Fezandipiti ex was added to Alice's hand.
+Staryu was added to Alice's hand.
+Bob's Fan Rotom is now in the Active Spot.
+Alice's Turn
+Alice drew Lillie's Determination.
+Alice's Mega Starmie ex used Jetting Blow on Bob’s Fan Rotom for 120 damage.
+- Bob's Toucannon took 50 damage.
+Bob's Fan Rotom was Knocked Out!
+Mist Energy was discarded from Bob's Fan Rotom.
+Bob's Toucannon was Knocked Out!
+- 3 cards were discarded from Bob's Toucannon.
+• Mist Energy, Trumbeak, Pikipek
+Alice took 2 Prize cards.
+Ultra Ball was added to Alice's hand.
+Poké Pad was added to Alice's hand.
+All Prize cards taken. Alice wins.
